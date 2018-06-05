@@ -12,10 +12,10 @@ defmodule PhotosWeb.ImageController do
 
   def index(conn, _params) do
     images = Assets.list_images()
-    maybe_user =
-      conn
-      |> PhotosWeb.Controllers.PageController.set_user_info(_params)
-    render(conn, "index.json", images: images, maybe_user: maybe_user)
+    # maybe_user =
+    #   conn
+    #   |> PhotosWeb.Controllers.PageController.set_user_info(_params)
+    render(conn, "index.json", images: images)
   end
 
   def new(conn, _params) do

@@ -11,15 +11,14 @@ defmodule PhotosWeb.PageController do
   def index(conn, _params) do
     changeset = Auth.change_user(%User{})
     maybe_user = Guardian.Plug.current_resource(conn)
-
+    
     maybe_user =
-      conn
-      |> set_user_info(_params)
-
-    if Guardian.Plug.current_resource(conn) == nil do
-      maybe_user = nil
-    end
-
+      if maybe_user != nil do
+        maybe_user
+        |> set_user_info
+      else
+        maybe_user
+      end
     conn
       |> render("index.html", changeset: changeset, action: page_path(conn, :login), maybe_user: maybe_user)
   end
@@ -51,24 +50,23 @@ defmodule PhotosWeb.PageController do
 
   def secret(conn, _params) do
     maybe_user =
-    conn
-    |> set_user_info(_params)
+      conn
+      |> set_user_info
     render(conn, "secret.html", maybe_user: maybe_user)
   end
 
-  def set_user_info(conn, _params) do
-    maybe_user = Guardian.Plug.current_resource(conn)
+  def set_user_info(maybe_user) do
     key =
       if maybe_user != nil do
-      :crypto.hmac(:sha256, "rc0Uv-tMH0Gy6faPXCa2tRf_9DVBqMylADkagtFV", Integer.to_string(maybe_user.id))
-      |> Base.encode16
-      |> String.downcase
-    else
-      maybe_user = %{maybe_user: nil}
+        :crypto.hmac(:sha256, "rc0Uv-tMH0Gy6faPXCa2tRf_9DVBqMylADkagtFV", maybe_user.email)
+        |> Base.encode16
+        |> String.downcase
     end
 
-    maybe_user
-    |> Map.merge %{key: key}
+    final_map =
+        maybe_user
+        |> Map.merge(%{key: key})
+
   end
 
   # defp intercom(conn, _params) do
