@@ -48,7 +48,9 @@ defmodule Photos.Mixfile do
       {:arc_ecto, "~> 0.7.0"},
       {:absinthe, "~> 1.4.0"},
       {:absinthe_plug, "~> 1.4"},
-      {:poison, "~> 3.1"}
+      {:poison, "~> 3.1"},
+      {:estree, "~> 2.3.0"},
+      {:httpoison, "~> 0.8"},
     ]
   end
 

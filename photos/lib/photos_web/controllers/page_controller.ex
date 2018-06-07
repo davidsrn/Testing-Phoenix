@@ -1,26 +1,20 @@
 defmodule PhotosWeb.PageController do
   use PhotosWeb, :controller
-  # require Intercom
 
   alias Photos.Auth
   alias Photos.Auth.User
   alias Photos.Auth.Guardian
 
-  # plug :intercom
+  import Photos.Sessions
 
   def index(conn, _params) do
     changeset = Auth.change_user(%User{})
-    maybe_user = Guardian.Plug.current_resource(conn)
-    
-    maybe_user =
-      if maybe_user != nil do
-        maybe_user
-        |> set_user_info
-      else
-        maybe_user
-      end
+    conn =
+      conn
+      |> set_user_info
+      |> assign(:action, "<script>Intercom('trackEvent', 'see_user');</script>")
     conn
-      |> render("index.html", changeset: changeset, action: page_path(conn, :login), maybe_user: maybe_user)
+      |> render("index.html", changeset: changeset, action: page_path(conn, :login))
   end
 
   def login(conn, %{"user" => %{"username" => username, "password" => password}}) do
@@ -49,32 +43,10 @@ defmodule PhotosWeb.PageController do
   end
 
   def secret(conn, _params) do
-    maybe_user =
+    conn =
       conn
       |> set_user_info
-    render(conn, "secret.html", maybe_user: maybe_user)
+    render(conn, "secret.html")
   end
 
-  def set_user_info(maybe_user) do
-    key =
-      if maybe_user != nil do
-        :crypto.hmac(:sha256, "rc0Uv-tMH0Gy6faPXCa2tRf_9DVBqMylADkagtFV", maybe_user.email)
-        |> Base.encode16
-        |> String.downcase
-    end
-
-    final_map =
-        maybe_user
-        |> Map.merge(%{key: key})
-
-  end
-
-  # defp intercom(conn, _params) do
-  #   {:ok, snippet} = Intercom.snippet(
-  #     %{email: "bob@foo.com"},
-  #     app_id: "<your app id>",
-  #     secret: "<your secret>"
-  #   )
-  #   assign(conn, :intercom, snippet)
-  # end
 end

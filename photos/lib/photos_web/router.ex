@@ -1,6 +1,7 @@
 defmodule PhotosWeb.Router do
   use PhotosWeb, :router
-
+  import Photos.Sessions
+  require Intercom
   pipeline :browser do
     plug :accepts, ["html"]
     plug :fetch_session
@@ -19,6 +20,7 @@ defmodule PhotosWeb.Router do
 
   pipeline :auth do
     plug Photos.Auth.Pipeline
+    plug :intercom
   end
 
   pipeline :ensure_auth do

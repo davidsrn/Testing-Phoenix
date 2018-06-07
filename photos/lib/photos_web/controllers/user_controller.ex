@@ -4,12 +4,20 @@ defmodule PhotosWeb.UserController do
   alias Photos.Auth
   alias Photos.Auth.User
 
+  import Photos.Sessions
+
   def index(conn, _params) do
+    conn =
+      conn
+      |> set_user_info
     users = Auth.list_users()
     render(conn, "index.html", users: users)
   end
 
   def new(conn, _params) do
+    conn =
+      conn
+      |> set_user_info
     changeset = Auth.change_user(%User{})
     render(conn, "new.html", changeset: changeset)
   end
@@ -26,17 +34,26 @@ defmodule PhotosWeb.UserController do
   end
 
   def show(conn, %{"id" => id}) do
+    conn =
+      conn
+      |> set_user_info
     user = Auth.get_user!(id)
     render(conn, "show.html", user: user)
   end
 
   def edit(conn, %{"id" => id}) do
+    conn =
+      conn
+      |> set_user_info
     user = Auth.get_user!(id)
     changeset = Auth.change_user(user)
     render(conn, "edit.html", user: user, changeset: changeset)
   end
 
   def update(conn, %{"id" => id, "user" => user_params}) do
+    conn =
+      conn
+      |> set_user_info
     user = Auth.get_user!(id)
 
     case Auth.update_user(user, user_params) do
